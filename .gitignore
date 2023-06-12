@@ -141,4 +141,3 @@ cython_debug/
 # customized for files too large to get onto github
 data/othello_synthetic
 data/othello_championship
-ckpts/*
