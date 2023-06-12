@@ -152,25 +152,3 @@ def generate_random_game() -> list[int]:
     agenttwo = RandomAgent(cf)
     arena = Arena(agentone, agenttwo, cf)
     return arena.transcript
-        
-
-# cf = ConnectFour()
-# agentone = RandomAgent(cf)
-# agenttwo = RandomAgent(cf)
-# arena = Arena(agentone, agenttwo, cf)
-# winner = arena.play()
-# print("Game state: {}".format(winner))
-# arena.game.print_board()
-# print(arena.transcript)
-# cf.board[5][1] = 1
-# cf.board[5][2] = 2
-# cf.board[4][1] = 1
-# cf.board[0][1] = 3
-# cf.print_board()
-# print("MOVES:", cf.generate_legal_moves())
-# print(np.random.choice(cf.generate_legal_moves()))
-# print()
-# print(cf.board[:, 1])
-# print(cf.board[0][1])
-# print(cf.board[0,:])
-# print(cf.board.shape)
