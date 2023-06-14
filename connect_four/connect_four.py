@@ -43,7 +43,10 @@ class ConnectFour:
         self.apply_move(piece, column)
 
     def is_move_possible(self, column: int) -> bool:
-        return self.board[0][column] == self.empty_cell
+        return (
+            0 <= column < self.columns_count and
+            self.board[0][column] == self.empty_cell
+        )
 
     def apply_move(self, piece: int, selected_column: int) -> None:
         """
@@ -146,9 +149,9 @@ class Arena:
                     return winner
                 
 
-def generate_random_game() -> list[int]:
-    cf = ConnectFour()
+def generate_random_game(cf: ConnectFour) -> tuple[list[int], ConnectFour]:
     agentone = RandomAgent(cf)
     agenttwo = RandomAgent(cf)
     arena = Arena(agentone, agenttwo, cf)
-    return arena.transcript
+    arena.play()
+    return arena.transcript, arena.game
