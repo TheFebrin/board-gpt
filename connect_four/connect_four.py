@@ -25,6 +25,7 @@ class ConnectFour:
         ])
         self.columns_count = columns_count
         self.rows_count = rows_count
+        self.history = []
 
     def print_board(self):
         for row in self.board:
@@ -37,10 +38,11 @@ class ConnectFour:
         ]
         return res
 
-    def make_move(self, piece: int, column: int):
+    def make_move(self, piece: int, column: int) -> None:
         if not self.is_move_possible(column):
             raise IllegalMove(f"Illegal move: {column}", piece)
         self.apply_move(piece, column)
+        self.history.append(column)
 
     def is_move_possible(self, column: int) -> bool:
         return (
@@ -136,22 +138,20 @@ class Arena:
             2: agent_two
         }
         self.game = game
-        self.transcript = []
 
     def play(self) -> int:
         while True:
             for players_piece, agent in self.players.items():
                 move = agent.choose_move()
                 self.game.make_move(players_piece, move)
-                self.transcript.append(move)
                 winner = self.game.is_game_finished()
                 if winner != -1:
                     return winner
                 
 
-def generate_random_game(cf: ConnectFour) -> tuple[list[int], ConnectFour]:
+def generate_random_game(cf: ConnectFour) -> tuple[int, ConnectFour]:
     agentone = RandomAgent(cf)
     agenttwo = RandomAgent(cf)
     arena = Arena(agentone, agenttwo, cf)
-    arena.play()
-    return arena.transcript, arena.game
+    winner = arena.play()
+    return winner, arena.game
