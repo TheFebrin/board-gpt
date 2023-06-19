@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 import time
 from tqdm import tqdm
 from typing import Tuple
-from agents import Agent, RandomAgent, MinMaxAgent
-from connect_four import ConnectFour
+from connect_four.agents import Agent, RandomAgent, MinMaxAgent
+from connect_four.connect_four import ConnectFour
 
 
 class Arena:
@@ -27,10 +27,10 @@ class Arena:
 
 
 def generate_random_game(cf: ConnectFour) -> Tuple[int, ConnectFour]:
-    agent_one = MinMaxAgent(game=cf, player_id=1, max_depth=1)
-    # agent_one = RandomAgent(game=cf)
-    agent_two = MinMaxAgent(game=cf, player_id=2, max_depth=1)
-    # agent_two = RandomAgent(game=cf)
+    # agent_one = MinMaxAgent(game=cf, player_id=1, max_depth=1)
+    agent_one = RandomAgent(game=cf)
+    # agent_two = MinMaxAgent(game=cf, player_id=2, max_depth=1)
+    agent_two = RandomAgent(game=cf)
     arena = Arena(agent_one=agent_one, agent_two=agent_two, game=cf)
     winner = arena.play()
     return winner, arena.game
