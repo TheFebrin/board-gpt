@@ -1,31 +1,44 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import List
-from connect_four import ConnectFour
+from connect_four.connect_four import ConnectFour
+from mingpt.utils import sample
+from mingpt.model import GPT
+import torch
+import random
+from connect_four.data_processing_config import DatasetPreprocessingConfig
 
 
 class Agent(ABC):
     @abstractmethod
     def choose_move(self) -> int:
         raise NotImplementedError
+    
+    def set_game(self, game: ConnectFour) -> None:
+        self._game = game
+    
+    def set_player_id(self, player_id: int) -> None:
+        assert player_id in [1, 2]
+        self._player_id = player_id
 
 
 class RandomAgent(Agent):
-    def __init__(self, game: ConnectFour):
-        self.game = game
+    def __init__(self, game: ConnectFour, name: str = ""):
+        self._game = game
+        self.name = name
 
     def choose_move(self) -> int:
-        possible_moves = self.game.generate_legal_moves()
+        possible_moves = self._game.generate_legal_moves()
         selected_move = np.random.choice(possible_moves)
         return selected_move
 
 
 class MinMaxAgent(Agent):
-    def __init__(self, game: ConnectFour, max_depth: int, player_id: int):
+    def __init__(self, game: ConnectFour, max_depth: int, player_id: int, name: str = ""):
         self._game = game
         self._max_depth = max_depth
-        assert player_id in [1, 2]
-        self._player_id = player_id
+        self.set_player_id(player_id)
+        self.name = name
 
     def choose_move(self) -> int:
         best_score = -np.inf
@@ -134,3 +147,40 @@ class MinMaxAgent(Agent):
             score -= 80  # increased penalty for opponent about to win
 
         return score
+
+
+class GPTAgent(Agent):
+    def __init__(
+            self,
+            model: GPT,
+            game: ConnectFour,
+            preprocessing_config: DatasetPreprocessingConfig,
+            device: int,
+            first_move: int = None,
+            name: str = "",
+            randomness: float = 0.0
+        ):
+        self.model = model
+        self.device= device
+        self._game = game
+        self.config = preprocessing_config
+        if first_move is None:
+            first_move = np.random.choice(list(range(game.columns_count)))
+        self.first_move = first_move
+        self.name = name
+        self.randomness = randomness
+
+    def choose_move(self) -> int:
+        if random.uniform(0, 1.0) <= self.randomness:
+            possible_moves = self._game.generate_legal_moves()
+            selected_move = np.random.choice(possible_moves)
+            return selected_move
+        elif len(self._game.history) == 0:
+            return self.first_move
+        else:
+            x = torch.tensor(
+                [self.config.to_model_repr[s] for s in self._game.history], dtype=torch.long
+            )[None, ...].to(self.device)
+            y = sample(self.model, x, 1, temperature=1.0)[0]
+            completion = [self.config.from_model_repr[int(i)] for i in y if i != -1]
+            return completion[-1]

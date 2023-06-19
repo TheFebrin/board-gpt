@@ -2,8 +2,9 @@ import itertools
 import torch
 from tqdm import tqdm
 from torch.utils.data import Dataset
-from dataclasses import dataclass
-from connect_four.connect_four import generate_random_game, ConnectFour
+from connect_four.connect_four import ConnectFour
+from connect_four.arena import generate_random_game
+from connect_four.data_processing_config import DatasetPreprocessingConfig
 
 
 class ConnectFourDataset:
@@ -31,22 +32,6 @@ class ConnectFourDataset:
     def __getitem__(self, i):
         return self.sequences[i]
     
-
-
-@dataclass
-class DatasetPreprocessingConfig:
-    """
-    Stores:
-    to_model_repr: mapping used to map the transcripts into the format accepted by the model,
-    from_model_repr: mapping used to translate the model's output to the original format
-        of the game transcription.
-    data_size: used by the GPT
-    vocab_size: used by the GPT
-    """
-    to_model_repr: dict[int, int]
-    from_model_repr: dict[int, int]
-    block_size: int
-    vocab_size: int
 
 
 class CharConnectFourDataset(Dataset):

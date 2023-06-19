@@ -55,6 +55,7 @@ class ConnectFour:
         for row_idx in range(len(self.board[:, column])):
             if self.board[row_idx][column] != self.empty_cell:
                 self.board[row_idx][column] = self.empty_cell
+                self.history.pop()
                 return
 
     def is_move_possible(self, column: int) -> bool:
