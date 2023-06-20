@@ -1,3 +1,4 @@
+from typing import Dict
 from dataclasses import dataclass
 
 
@@ -11,7 +12,8 @@ class DatasetPreprocessingConfig:
     data_size: used by the GPT
     vocab_size: used by the GPT
     """
-    to_model_repr: dict[int, int]
-    from_model_repr: dict[int, int]
+
+    to_model_repr: Dict[int, int]
+    from_model_repr: Dict[int, int]
     block_size: int
     vocab_size: int

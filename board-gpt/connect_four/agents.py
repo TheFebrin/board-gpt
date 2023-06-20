@@ -13,10 +13,10 @@ class Agent(ABC):
     @abstractmethod
     def choose_move(self) -> int:
         raise NotImplementedError
-    
+
     def set_game(self, game: ConnectFour) -> None:
         self._game = game
-    
+
     def set_player_id(self, player_id: int) -> None:
         assert player_id in [1, 2]
         self._player_id = player_id
@@ -34,18 +34,25 @@ class RandomAgent(Agent):
 
 
 class MinMaxAgent(Agent):
-    def __init__(self, game: ConnectFour, max_depth: int, player_id: int, name: str = ""):
+    def __init__(
+        self, game: ConnectFour, max_depth: int, player_id: int, name: str = ""
+    ):
         self._game = game
         self._max_depth = max_depth
         self.set_player_id(player_id)
         self.name = name
+
+    def __str__(self) -> str:
+        return "Min Max Agent"
 
     def choose_move(self) -> int:
         best_score = -np.inf
         best_move = None
         for move in self._game.generate_legal_moves(shuffle=True):
             self._game.make_move(piece=self._player_id, column=move)
-            score = self._minimax(depth=0, is_maximizing=False, alpha=-np.inf, beta=np.inf)
+            score = self._minimax(
+                depth=0, is_maximizing=False, alpha=-np.inf, beta=np.inf
+            )
             self._game.undo_move(column=move)
             # print(f"[{self._player_id}] Move: ", move, "Score: ", score)
             if score > best_score:
@@ -61,7 +68,9 @@ class MinMaxAgent(Agent):
             max_eval = -np.inf
             for move in self._game.generate_legal_moves(shuffle=True):
                 self._game.make_move(piece=self._player_id, column=move)
-                eval = self._minimax(depth=depth + 1, is_maximizing=False, alpha=alpha, beta=beta)
+                eval = self._minimax(
+                    depth=depth + 1, is_maximizing=False, alpha=alpha, beta=beta
+                )
                 self._game.undo_move(column=move)
                 max_eval = max(max_eval, eval)
                 alpha = max(alpha, eval)
@@ -71,8 +80,12 @@ class MinMaxAgent(Agent):
         else:
             min_eval = np.inf
             for move in self._game.generate_legal_moves(shuffle=True):
-                self._game.make_move(piece=2 if self._player_id == 1 else 1, column=move)
-                eval = self._minimax(depth=depth + 1, is_maximizing=True, alpha=alpha, beta=beta)
+                self._game.make_move(
+                    piece=2 if self._player_id == 1 else 1, column=move
+                )
+                eval = self._minimax(
+                    depth=depth + 1, is_maximizing=True, alpha=alpha, beta=beta
+                )
                 self._game.undo_move(column=move)
                 min_eval = min(min_eval, eval)
                 beta = min(beta, eval)
@@ -86,10 +99,10 @@ class MinMaxAgent(Agent):
 
     def evaluate_board(self) -> int:
         """
-        Scores the board based on the player's pieces' strategic positioning. 
-            it gives preference to the center column, 
-            as control of the center is generally advantageous in Connect Four. 
-            It also checks all possible four-piece combinations (windows) 
+        Scores the board based on the player's pieces' strategic positioning.
+            it gives preference to the center column,
+            as control of the center is generally advantageous in Connect Four.
+            It also checks all possible four-piece combinations (windows)
             in the horizontal, vertical, and diagonal directions.
         """
         score: int = 0
@@ -151,17 +164,17 @@ class MinMaxAgent(Agent):
 
 class GPTAgent(Agent):
     def __init__(
-            self,
-            model: GPT,
-            game: ConnectFour,
-            preprocessing_config: DatasetPreprocessingConfig,
-            device: int,
-            first_move: int = None,
-            name: str = "",
-            randomness: float = 0.0
-        ):
+        self,
+        model: GPT,
+        game: ConnectFour,
+        preprocessing_config: DatasetPreprocessingConfig,
+        device: int,
+        first_move: int = None,
+        name: str = "",
+        randomness: float = 0.0,
+    ):
         self.model = model
-        self.device= device
+        self.device = device
         self._game = game
         self.config = preprocessing_config
         if first_move is None:
@@ -170,6 +183,9 @@ class GPTAgent(Agent):
         self.name = name
         self.randomness = randomness
 
+    def __str__(self) -> str:
+        return "GPT Agent"
+    
     def choose_move(self) -> int:
         if random.uniform(0, 1.0) <= self.randomness:
             possible_moves = self._game.generate_legal_moves()
@@ -179,7 +195,8 @@ class GPTAgent(Agent):
             return self.first_move
         else:
             x = torch.tensor(
-                [self.config.to_model_repr[s] for s in self._game.history], dtype=torch.long
+                [self.config.to_model_repr[s] for s in self._game.history],
+                dtype=torch.long,
             )[None, ...].to(self.device)
             y = sample(self.model, x, 1, temperature=1.0)[0]
             completion = [self.config.from_model_repr[int(i)] for i in y if i != -1]
