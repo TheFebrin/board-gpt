@@ -1,0 +1,5 @@
+torch==1.13.1+cu117
+torchaudio==0.13.1+cu117
+torchsummary==1.5.1
+torchtext==0.6.0
+torchvision==0.14.1+cu117
