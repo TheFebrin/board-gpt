@@ -5,3 +5,5 @@ torchvision
 torch-scatter
 pandas
 numpy
+matplotlib
+scipy
