@@ -1,5 +1,7 @@
 tqdm
 -f https://data.pyg.org/whl/torch-1.13.0+cpu.html
+torch
+torchvision
 torch-scatter
 pandas
 numpy
