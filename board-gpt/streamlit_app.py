@@ -1,5 +1,6 @@
 import streamlit as st
 import pickle
+import os
 from connect_four.connect_four import ConnectFour
 from connect_four.agents import Agent, MinMaxAgent, GPTAgent
 from mingpt.model import GPT, GPTConfig
@@ -15,6 +16,7 @@ def create_agent(board: ConnectFour, agent: str):
     if agent == "MinMax":
         agent = MinMaxAgent(board, max_depth=3, player_id=2)
     else:
+        print("Files: ", os.listdir())
         with open("minmax_biggest_dataset_100970.pkl", "rb") as f:
             minmax_games = pickle.load(f)
         minmax_cf_data = ConnectFourDataset(data_size=0, train_size=7138, games_to_use=minmax_games)
