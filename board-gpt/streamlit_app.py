@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
 import os
+import torch
 from connect_four.connect_four import ConnectFour
 from connect_four.agents import Agent, MinMaxAgent, GPTAgent
 from mingpt.model import GPT, GPTConfig
