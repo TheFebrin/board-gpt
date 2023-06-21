@@ -17,7 +17,8 @@ def create_agent(board: ConnectFour, agent: str):
         agent = MinMaxAgent(board, max_depth=3, player_id=2)
     else:
         print("Files: ", os.listdir())
-        with open("minmax_biggest_dataset_100970.pkl", "rb") as f:
+        print("Files board-gpt: ", os.listdir("board-gpt"))
+        with open("board-gpt/minmax_biggest_dataset_100970.pkl", "rb") as f:
             minmax_games = pickle.load(f)
         minmax_cf_data = ConnectFourDataset(data_size=0, train_size=7138, games_to_use=minmax_games)
         minmax_char_cf_dataset = CharConnectFourDataset(minmax_cf_data)
@@ -26,7 +27,7 @@ def create_agent(board: ConnectFour, agent: str):
             n_embd=512
         )
         model = GPT(mconf).to("cpu")
-        model.load_state_dict(torch.load("BIG_V3_gpt_at_20230620_213816.ckpt"))
+        model.load_state_dict(torch.load("board-gpt/BIG_V3_gpt_at_20230620_213816.ckpt"))
         agent = GPTAgent(
             model=model,
             game=board,
