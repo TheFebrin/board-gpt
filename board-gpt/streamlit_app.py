@@ -28,7 +28,9 @@ def create_agent(board: ConnectFour, agent: str):
             n_embd=512
         )
         model = GPT(mconf).to("cpu")
-        model.load_state_dict(torch.load("board-gpt/BIG_V3_gpt_at_20230620_213816.ckpt"))
+        model.load_state_dict(
+            torch.load("board-gpt/BIG_V3_gpt_at_20230620_213816.ckpt", map_location=torch.device('cpu'))
+        )
         agent = GPTAgent(
             model=model,
             game=board,
